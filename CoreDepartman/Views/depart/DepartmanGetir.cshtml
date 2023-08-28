@@ -1,0 +1,60 @@
+﻿@model CoreDepartman.Models.departmanlar
+@{
+    ViewData["Title"] = "DepartmanGetir";
+    Layout = "~/Views/Shared/_TestLayout.cshtml";
+}
+
+<h1>DepartmanGetir</h1>
+<!--
+    Başlangıç formu oluştur, bu form DepartmanGuncelle ActionResult'ını çalıştırsın.
+    Depart adındaki controller içinde olacak, form methodu Post olduğunda çalışacak.
+    Yani butona tıklanınca action'a form verileri gidecek.
+-->
+@using (Html.BeginForm("Guncelle", "depart", FormMethod.Post))
+{
+    @Html.LabelFor(x => x.ID) <!-- Veya direkt Departman Adı yazılabilir, Html.LabelFor'a gerek yok -->
+    @Html.TextBoxFor(x => x.ID, new { @class = "form-control",@id="departidX", @readonly ="readonly" })
+
+    <br />
+    @Html.LabelFor(x => x.DepartmanAd) <!-- Veya direkt Departman Adı yazılabilir, Html.LabelFor'a gerek yok -->
+    @Html.TextBoxFor(x => x.DepartmanAd, new { @class = "form-control", @id="departadX" })
+    <br />
+    <button id="btnGuncelle" class="btn btn-default" style="background-color:darkorange;">Departman Güncelle</button>
+}
+@* ÜSTTEKİ KULLANIMM YERİNE ALTTAKİDE TERCİH EDİLEBİLİR
+    <form action="@Url.Action("Guncelle", "depart")" method="post">
+    <label for="ID">ID</label>
+    <input type="text" id="departidX" name="ID" class="form-control" readonly="readonly" value="@Model.ID" />
+
+    <br />
+
+    <label for="DepartmanAd">Departman Adı</label>
+    <input type="text" id="departadX" name="DepartmanAd" class="form-control" value="@Model.DepartmanAd" />
+    <br />
+
+    <button id="btnGuncelle" class="btn btn-default" style="background-color: darkorange;">Departman Güncelle</button>
+</form>*@
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $("#btnGuncelle").click(function () {
+            let obj = {
+                ID: $("#departidX").val(),
+                DepartmanAd: $("#departadX").val()
+            };
+            $.ajax({
+                type: "POST",
+                url: window.location.origin + "/depart/Guncelle",
+                data:obj,
+                success: function(data){
+                },
+                error:function(){
+
+                }
+            });
+
+        })
+    </script>
+    
+
+}

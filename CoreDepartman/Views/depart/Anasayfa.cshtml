@@ -1,0 +1,102 @@
+﻿@model CoreDepartman.Models.departmanlar
+@{
+    ViewData["Title"] = "Anasayfa";
+    Layout = "~/Views/Shared/_TestLayout.cshtml";
+}
+<br />
+<h2>Departman Ekle</h2>
+<br />
+<input type="text" id="departad" placeholder="Departman AD?..." class="form-control" />
+<span class="error text-danger"></span>
+<br /><br />
+<button type="button" id="btnEkle" class="btn btn-success">EKLE</button>
+<br /><br />
+<h3>DEPARTMANLAR TABLOSU</h3>
+<br />
+<table class="table table-bordered table-container">
+    <tr>
+        <td>ID</td>
+        <td>DepartmanAd</td>
+        <td>SİL</td>
+        <td>GÜNCELLE</td>
+    </tr>
+</table>
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+
+        //TABLOYA VERİ EKLEME FONKSİYONU VE EKLENEN VERİYİ ANLIK EKLEME
+        $("#btnEkle").click(function(){
+            let obj = {
+                DepartmanAd: $("#departad").val()   
+            };
+            $.ajax({
+                type:"POST",
+                url: window.location.origin + "/depart/Ekle",
+                data:obj,
+                success: function(data){
+                    console.log(data)
+                    let newRowHtml = `<tr data-id="${data.id}">
+                <td>${data.id}</td>
+                <td>${data.departmanAd}</td>
+                <td><a onclick="ajaxFuncDelete(${data.id})" class="btn btn-danger btnDelete" data-id="${data.id}">Sil</a></td>
+                <td><a href="/depart/DepartmanGetir/${data.id}" class="btn btn-success">Güncelle</a></td>
+                <td>...</td>
+                </tr>`;
+                    $(".table-container").append(newRowHtml); // Yeni satırı ekleyin
+                    $("#departad").val(''); // Girdi alanını temizle
+                },
+                error: function (data) {
+                    // Hatalı durum
+                    console.log(data)
+                        let errorData = data.responseJSON;
+                        $(".error").text(errorData["DepartmanAd"][0]);
+                    
+                }
+            })
+        })
+        ///DELETE FONKSİYONU
+        function ajaxFuncDelete(ID) {
+            var obj = {
+                id: ID
+            };
+            $.ajax({
+                type: "POST",
+                url: window.location.origin + "/depart/delete",
+                data: obj,
+                dataType: "json",
+                success: function (data) {
+                    $("tr[data-id='" + ID + "']").remove();
+                },
+                error: function () {
+                    alert("AJAX Çağrı Hatası");
+                }
+            });
+        };
+ 
+        //VERİLERİ SAYFA ÜZERİNDE GÖRÜNTÜLEME
+        $(document).ready(function () {
+            $.ajax({
+                type: "GET",
+                url: window.location.origin + "/depart/Listele",
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                    let tableHtml = "<table class='table table-bordered'><tr><th>ID</th><th>DEPARTMAN</th><th>SİL</th><th>GÜNCELLE</th><th>DETAYLAR</th></tr>";
+                    $.each(data, function (index, value) {
+
+                        tableHtml += `<tr data-id="${value.id}">
+                                                <td>${value.id}</td>
+                                                <td>${value.departmanAd}</td>
+                                                <td><a onclick="ajaxFuncDelete(${value.id})" class="btn btn-danger btnDelete" data-id="${value.id}">Sil</a></td>
+                                                 <td><a href="/depart/DepartmanGetir/${value.id}" class="btn btn-success">Güncelle</a></td>
+                                                <td>...</td>
+                                            </tr>`;
+                    });
+                    tableHtml += "</table>";
+                    $(".table-container").html(tableHtml)
+                }
+            });
+        });
+    </script>
+    }
